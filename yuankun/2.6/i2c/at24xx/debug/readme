@@ -1,0 +1,87 @@
+debug this module, there's kernel oops
+
+[root@FriendlyARM modules]# i2ctest r 0 20                                      
+Unable to handle kernel NULL pointer dereference at virtual address 00000000    
+pgd = c0004000                                                                  
+[00000000] *pgd=00000000                                                        
+Internal error: Oops: 817 [#1]                                                  
+last sysfs file: /sys/devices/virtual/at24xx/at24xx/dev                         
+Modules linked in: at24xx_drv [last unloaded: at24xx_drv]                       
+CPU: 0    Not tainted  (2.6.32.2-FriendlyARM #5)                                
+PC is at s3c24xx_i2c_irq+0x168/0x3dc                                            
+LR is at handle_IRQ_event+0x60/0x130                                            
+pc : [<c024f98c>]    lr : [<c0071500>]    psr: 80000093                         
+sp : c04b5eb8  ip : c04b5ee0  fp : c04b5edc                                     
+r10: 3002011c  r9 : 41129200  r8 : 30020150                                     
+r7 : 0000002b  r6 : 000000b0  r5 : 00000000  r4 : c3841c00                      
+r3 : 00000000  r2 : c39fff2c  r1 : 00000000  r0 : 00000020                      
+Flags: Nzcv  IRQs off  FIQs on  Mode SVC_32  ISA ARM  Segment kernel            
+Control: c000717f  Table: 339c4000  DAC: 00000017                               
+Process swapper (pid: 0, stack limit = 0xc04b4270)                              
+Stack: (0xc04b5eb8 to 0xc04b6000)                                               
+5ea0:                                                       c385bcc0 00000000   
+5ec0: 00000000 0000002b 30020150 41129200 c04b5efc c04b5ee0 c0071500 c024f834   
+5ee0: c04bdefc c385bcc0 0000002b c05182ac c04b5f1c c04b5f00 c0073000 c00714b0   
+5f00: 0000002b c04ca33c 00000000 c04b8448 c04b5f3c c04b5f20 c0030044 c0072f68   
+5f20: ffffffff f4000000 08000000 c04b8448 c04b5f94 c04b5f40 c0030b04 c0030010   
+5f40: f4100000 00000032 f4100000 60000013 c04b4000 c04f4b64 c04b8450 c04b8448   
+5f60: 30020150 41129200 3002011c c04b5f94 c04b5f98 c04b5f88 c003264c c0032064   
+5f80: 60000013 ffffffff c04b5fb4 c04b5f98 c003264c c0031fe4 c051832c c04f4900   
+5fa0: c0021000 c04b8448 c04b5fc4 c04b5fb8 c0387b84 c00325e4 c04b5ff4 c04b5fc8   
+5fc0: c00089a8 c0387b38 c00084f4 00000000 00000000 c0021ca0 00000000 c0007175   
+5fe0: c04f4c10 c0021c9c 00000000 c04b5ff8 30008034 c00087ac 00000000 00000000   
+Backtrace:                                                                      
+[<c024f824>] (s3c24xx_i2c_irq+0x0/0x3dc) from [<c0071500>] (handle_IRQ_event+0x)
+ r9:41129200 r8:30020150 r7:0000002b r6:00000000 r5:00000000                    
+r4:c385bcc0                                                                     
+[<c00714a0>] (handle_IRQ_event+0x0/0x130) from [<c0073000>] (handle_edge_irq+0x)
+ r7:c05182ac r6:0000002b r5:c385bcc0 r4:c04bdefc                                
+[<c0072f58>] (handle_edge_irq+0x0/0x16c) from [<c0030044>] (asm_do_IRQ+0x44/0x8)
+ r7:c04b8448 r6:00000000 r5:c04ca33c r4:0000002b                                
+[<c0030000>] (asm_do_IRQ+0x0/0x8c) from [<c0030b04>] (__irq_svc+0x24/0xa0)      
+Exception stack(0xc04b5f40 to 0xc04b5f88)                                       
+5f40: f4100000 00000032 f4100000 60000013 c04b4000 c04f4b64 c04b8450 c04b8448   
+5f60: 30020150 41129200 3002011c c04b5f94 c04b5f98 c04b5f88 c003264c c0032064   
+5f80: 60000013 ffffffff                                                         
+ r7:c04b8448 r6:08000000 r5:f4000000 r4:ffffffff                                
+[<c0031fd4>] (default_idle+0x0/0x9c) from [<c003264c>] (cpu_idle+0x78/0xb0)     
+[<c00325d4>] (cpu_idle+0x0/0xb0) from [<c0387b84>] (rest_init+0x5c/0x70)        
+ r7:c04b8448 r6:c0021000 r5:c04f4900 r4:c051832c                                
+[<c0387b28>] (rest_init+0x0/0x70) from [<c00089a8>] (start_kernel+0x20c/0x27c)  
+[<c000879c>] (start_kernel+0x0/0x27c) from [<30008034>] (0x30008034)            
+Code: e594200c e5d3000c e5921008 e5943018 (e7c10003)                            
+---[ end trace bc1905a9e1df01b4 ]---                                            
+Kernel panic - not syncing: Fatal exception in interrupt                        
+Backtrace:                                                                      
+[<c0035270>] (dump_backtrace+0x0/0x10c) from [<c038a33c>] (dump_stack+0x18/0x1c)
+ r7:c024f98c r6:c04f5170 r5:c04b5ccf r4:c024f98c                                
+[<c038a324>] (dump_stack+0x0/0x1c) from [<c038a38c>] (panic+0x4c/0x134)         
+[<c038a340>] (panic+0x0/0x134) from [<c0035580>] (die+0x204/0x240)              
+ r3:00010000 r2:c04bb648 r1:000082b3 r0:c04476e0                                
+[<c003537c>] (die+0x0/0x240) from [<c0037934>] (__do_kernel_fault+0x6c/0x7c)    
+[<c00378c8>] (__do_kernel_fault+0x0/0x7c) from [<c0037a8c>] (do_page_fault+0x14)
+ r7:c04b77c0 r6:00000000 r5:00000000 r4:c04b8618                                
+[<c0037944>] (do_page_fault+0x0/0x200) from [<c003028c>] (do_DataAbort+0x40/0xa)
+[<c003024c>] (do_DataAbort+0x0/0xa4) from [<c0030ac0>] (__dabt_svc+0x40/0x60)   
+Exception stack(0xc04b5e70 to 0xc04b5eb8)                                       
+5e60:                                     00000020 00000000 c39fff2c 00000000   
+5e80: c3841c00 00000000 000000b0 0000002b 30020150 41129200 3002011c c04b5edc   
+5ea0: c04b5ee0 c04b5eb8 c0071500 c024f98c 80000093 ffffffff                     
+[<c024f824>] (s3c24xx_i2c_irq+0x0/0x3dc) from [<c0071500>] (handle_IRQ_event+0x)
+ r9:41129200 r8:30020150 r7:0000002b r6:00000000 r5:00000000                    
+r4:c385bcc0                                                                     
+[<c00714a0>] (handle_IRQ_event+0x0/0x130) from [<c0073000>] (handle_edge_irq+0x)
+ r7:c05182ac r6:0000002b r5:c385bcc0 r4:c04bdefc                                
+[<c0072f58>] (handle_edge_irq+0x0/0x16c) from [<c0030044>] (asm_do_IRQ+0x44/0x8)
+ r7:c04b8448 r6:00000000 r5:c04ca33c r4:0000002b                                
+[<c0030000>] (asm_do_IRQ+0x0/0x8c) from [<c0030b04>] (__irq_svc+0x24/0xa0)      
+Exception stack(0xc04b5f40 to 0xc04b5f88)                                       
+5f40: f4100000 00000032 f4100000 60000013 c04b4000 c04f4b64 c04b8450 c04b8448   
+5f60: 30020150 41129200 3002011c c04b5f94 c04b5f98 c04b5f88 c003264c c0032064   
+5f80: 60000013 ffffffff                                                         
+ r7:c04b8448 r6:08000000 r5:f4000000 r4:ffffffff                                
+[<c0031fd4>] (default_idle+0x0/0x9c) from [<c003264c>] (cpu_idle+0x78/0xb0)     
+[<c00325d4>] (cpu_idle+0x0/0xb0) from [<c0387b84>] (rest_init+0x5c/0x70)        
+ r7:c04b8448 r6:c0021000 r5:c04f4900 r4:c051832c                                
+[<c0387b28>] (rest_init+0x0/0x70) from [<c00089a8>] (start_kernel+0x20c/0x27c)  
+[<c000879c>] (start_kernel+0x0/0x27c) from [<30008034>] (0x30008034) 

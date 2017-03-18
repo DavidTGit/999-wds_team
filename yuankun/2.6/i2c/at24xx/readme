@@ -1,0 +1,59 @@
+1. paste the following code to arch/arm/mach-s3c2410/mach-mini2440.c
+--todo with patch method later
+###################################
+/*add at24c04 i2c support */
+#include <linux/i2c.h>
+#include <linux/i2c/at24.h>
+static struct at24_platform_data at24c04 = {
+	.byte_len	= SZ_4K / 8,
+	.page_size	= 16,
+};
+
+static struct i2c_board_info __initdata micro2440_i2c_board_info[] = {
+	{
+		I2C_BOARD_INFO("at24c04", 0x60),
+		.platform_data	= &at24c04,
+	},
+	/*todo, add i2c accer*/
+	{
+		I2C_BOARD_INFO("HMC5883L", 0x1e),
+	},
+};
+
+################################### before here
+/* devices we initialise */
+
+static struct platform_device *mini2440_devices[] __initdata = {
+###################################
+then register the i2c_device
+static void __init mini2440_machine_init(void)
+{
+#if defined (LCD_WIDTH)
+	s3c24xx_fb_set_platdata(&mini2440_fb_info);
+#endif
+	s3c_i2c0_set_platdata(NULL);
+//add for 24c04
+	i2c_register_board_info(0, micro2440_i2c_board_info,ARRAY_SIZE(micro2440_i2c_board_info));
+			
+	s3c2410_gpio_cfgpin(S3C2410_GPC(0), S3C2410_GPC0_LEND);
+########################################################	
+加入code后,需重新编译,生成新的uImage,其将会含有0x50的i2c设备
+
+2. the driver code at24xx_drv.c is taking reference from 韦东山视频32课,以及部分code 韦东Linux视频第1第2期所有源码文档图片芯片手册/MINI2440源码/drivers_and_test/19th_i2c_drv/5th/at24cxx.c及其测试程序.
+通过测试程序理解了19th的i2c操作,基于此,做了以下改进
+原程序--只能读写一个字节从默认地址
+改进--读写任意字节数从不同起始地址
+编译,加载at24xx module,probe函数会被调用
+
+3. 测试
+i2ctest r addr length
+i2ctest w addr "characters here"
+addr is the offset address, e.g.
+i2ctest r 0 10-means read from offset 0 out of 10 bytes
+i2ctest w 0 "test as at24xx I2C device"--will write the chars from offset 0
+
+4. i2c tools
+i2cdetect  -l   --detect all i2c buses
+i2cdetect  -yr	bus-number--probe on a bus to find out devices attached to this bus
+i2cdump -y 0 0x50--dump data from address of 0x50 from bus i2c-0
+

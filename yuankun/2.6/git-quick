@@ -1,0 +1,24 @@
+1. has own github account, and add own ssh key to the account
+2. make new repository
+
+in local
+3. commands for new repository
+git init
+#compile the .gitignore to keep code clean
+git add .
+git commit -m "xxxxxxxxx"
+git remote add origin https://github.com/bbtmtl/test.git
+git push -u origin master
+
+or if there has already
+git remote add origin https://github.com/bbtmtl/test.git
+git push -u origin master
+
+
+in the test.git, add Collaborator
+bbtmtl/wds2-yk-2440
+	Settings
+		Collaborators
+			search for username in github
+
+
