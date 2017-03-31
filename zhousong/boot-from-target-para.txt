@@ -1,0 +1,17 @@
+
+otargs=noinitrd root=/dev/mtdblock3 init=/linuxrc console=ttySAC0
+bootcmd=nand read.jffs2 0x30007FC0 kernel; bootm 0x30007FC0
+bootdelay=2
+baudrate=115200
+ethaddr=08:00:3e:26:0a:5b
+ipaddr=192.168.7.17
+serverip=192.168.7.11
+netmask=255.255.255.0
+stdin=serial
+stdout=serial
+stderr=serial
+mtdids=nand0=nandflash0
+mtdparts=mtdparts=nandflash0:256k@0(bootloader),128k(params),2m(kernel),-(root)
+partition=nand0,0
+mtddevnum=0
+mtddevname=bootloader
