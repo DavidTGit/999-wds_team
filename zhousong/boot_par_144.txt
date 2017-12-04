@@ -1,0 +1,21 @@
+For boot parameter from nfs 
+Sam~>printenv
+
+bootcmd=nand read.jffs2 0x30007FC0 kernel; bootm 0x30007FC0
+bootdelay=2
+baudrate=115200
+ethaddr=08:00:3e:26:0a:5b
+netmask=255.255.255.0
+mtdids=nand0=nandflash0
+mtdparts=mtdparts=nandflash0:256k@0(bootloader),128k(params),2m(kernel),-(root)
+bootargs=noinitrd root=/dev/nfs nfsroot=192.168.1.144:/nfs_root/2.6.22.6 ip=192.168.1.168:192.168.1.144:192.168.1.1: 255.255.255.0::eth0:off console=ttySAC0,115200
+ipaddr=192.168.1.168
+serverip=192.168.1.144
+stdin=serial
+stdout=serial
+stderr=serial
+partition=nand0,0
+mtddevnum=0
+mtddevname=bootloader
+
+Environment size: 541/131068 bytes
