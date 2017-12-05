@@ -1,27 +1,39 @@
 #include "processParrent.h"
 
-int main()
-{
+int main(){
+	FILE* fp;
+	pid_t pid;
+	int i,j;
+	char filename[] = "/tmp/outchd.txt";
 
-    pid_t pid;
-    printf("This is the child process.\n");
+    printf("This is the child process..........\n");
     system ("ps -a | grep processchd ");
     pid = getpid();
-    printf("this child process pid =%d kill the number if you like\n", pid);
-    while(1)
+
+	fp = fopen(filename, "a+");
+	if(fp == NULL)
+	{
+		fclose(fp);
+		printf("open outchd.txt failed! This is the child process. pid = %d\n",pid);
+		return -1;
+	}
+    fprintf(fp, "this child process pid =%d kill the number if you like\n", pid);
+    while(child_counter--)
     {
-    	int i,j;
     	for(i = 1; i <= 10; i++)
     	{
     		for(j = 0; j < i; j++)
     		{
-        		printf("* ");
+        		fprintf(fp, "* ");
     		}
-			printf("\n");
+			fprintf(fp, "\n");
         	sleep(2);
     	}
-		printf("this child process pid =%d kill the number if you like\n", pid);
+		fprintf(fp, "this child process pid =%d kill the number if you like\n", pid);
 
     }
-    return 0;
+	if(fp != NULL)
+		fclose(fp);
+	return 0;
 }
+

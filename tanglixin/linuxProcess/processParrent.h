@@ -20,6 +20,7 @@ typedef struct spidev{
 char * name;
 int data[max_data_len];
 }SPI_DEVICE;
-
+static int main_counter = 60;
+static int child_counter = 120;
 
 #endif
