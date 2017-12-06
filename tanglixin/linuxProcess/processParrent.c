@@ -1,5 +1,4 @@
 #include "processParrent.h"
-FILE* fp;
 
 int funprt(){
     pid_t pid;
@@ -67,13 +66,14 @@ int funchd()
 #if 0
 int main()
 {
-    char filename[] = "/tmp/outmain.txt";
-    SPI_DEVICE spi_dev[max_devices];
+	FILE* fp;
+    char filemain[] = "/tmp/outmain.txt";
+    //SPI_DEVICE spi_dev[max_devices];
     pid_t pid, pidOP, pidP, pidC, process_id;
     int ret;
     pidOP = getpid();
     printf("This is the original parrent process, pid=%d\n", pidOP);
-    fp = fopen(filename,"a+");
+    fp = fopen(filemain,"a+");
 	if(fp == NULL)
 	{
 		fclose(fp);
@@ -96,6 +96,7 @@ int main()
     {
         pidP = getpid();
         printf("This is the parrent process after fork, pid=%d and getpid=%d \n", process_id, pidP);
+        fprintf(fp, "This is the parrent process after fork, pid=%d and getpid=%d \n", process_id, pidP);
         funprt();
         exit(0);
     }
@@ -103,15 +104,17 @@ int main()
     {
         pidC = getpid();
         printf("This is the child process, pid=%d and getpid=%d \n", process_id, pidC);
-		system("/usr/bin/processchd");
-		/*
-		ret = system("/usr/bin/processchd");
+        fprintf(fp, "This is the child process, pid=%d and getpid=%d \n", process_id, pidC);
+
+		//system("/usr/bin/processchd");
+		
+		ret = execl("/usr/bin/processchd","/usr/bin/processchd",(char *)NULL);
         if(ret == -1)
         {
             fprintf(fp, "child exec func return error = %s\n", strerror(errno));
             exit(0);
         }
-        */
+        
         exit(0);
     }
 
