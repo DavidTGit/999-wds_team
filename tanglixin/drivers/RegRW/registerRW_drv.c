@@ -25,7 +25,7 @@ static int my_drv_read(struct file *file, const char __user *buf, size_t count, 
 
     copy_to_user( buf,&val, 8);
     iounmap(reg_add);
-
+    
     return 0;
 }
 

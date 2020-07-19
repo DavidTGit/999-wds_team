@@ -12,6 +12,8 @@
 #include <net/if.h>
 #include <sys/wait.h>
 #include <math.h>
+#include <sys/mman.h>
+#include <fcntl.h>
 
 #define max_devices 10
 #define max_data_len 20
@@ -22,5 +24,11 @@ int data[max_data_len];
 }SPI_DEVICE;
 static int main_counter = 60;
 static int child_counter = 120;
+#define MAX_LEN 100
+struct region {        /* Defines "structure" of shared memory */
+    int len;
+    char buf[MAX_LEN];
+};
+
 
 #endif

@@ -1,13 +1,12 @@
 #include "processParrent.h"
 
 int funprt(){
-    pid_t pid;
 	int i,j;
 
     printf("This is the parrent process.\n");
     system ("ps -a | grep processmain ");
-    pid = getpid();
-    printf("this parrent process pid =%d kill the number if you like\n", pid);
+    pid_t pidP = getpid();
+    printf("this parrent process pid =%d kill the number if you like\n", pidP);
     while(main_counter--)
     {
     	for(i = 10; i >= 1; i--)
@@ -19,7 +18,7 @@ int funprt(){
 			printf("\n");
         	sleep(2);
     	}
-		printf("this parrent process pid =%d kill the number if you like\n", pid);
+		printf("this parrent process pid =%d kill the number if you like\n", pidP);
 
     }
     return 0;
@@ -66,20 +65,19 @@ int funchd()
 #if 0
 int main()
 {
-	FILE* fp;
     char filemain[] = "/tmp/outmain.txt";
     //SPI_DEVICE spi_dev[max_devices];
-    pid_t pid, pidOP, pidP, pidC, process_id;
+    pid_t pidOP, process_id;
     int ret;
     pidOP = getpid();
-    printf("This is the original parrent process, pid=%d\n", pidOP);
-    fp = fopen(filemain,"a+");
-	if(fp == NULL)
+	int pipe_fd[2];
+	int status = pipe(pipe_fd);
+	if(status < 0)
 	{
-		fclose(fp);
-		printf("This is the parrent process. pid = %d\n",pidOP);
+	    printf("This is the original parrent process, pid=%d\n", pidOP);
 		return -1;
 	}
+    printf("This is the original parrent process, pid=%d\n", pidOP);
 
     // Create child process
     process_id = fork();
@@ -94,15 +92,26 @@ int main()
     // PARENT PROCESS.
     else if (process_id > 0)
     {
-        pidP = getpid();
+    	FILE* fp;
+        fp = fopen(filemain,"a+");
+		if(fp == NULL)
+		{
+			fclose(fp);
+			printf("This is the parrent process. pid = %d\n",pidOP);
+			exit(0);
+		}
+
+        pid_t pidP = getpid();
         printf("This is the parrent process after fork, pid=%d and getpid=%d \n", process_id, pidP);
-        fprintf(fp, "This is the parrent process after fork, pid=%d and getpid=%d \n", process_id, pidP);
+		close(pipe_fd[0]);
+        write(pipe_fd[1], "This is the parrent process after fork, pid=%d and getpid=%d \n", process_id, pidP);
+		close(pipe_fd[1]);
         funprt();
         exit(0);
     }
     else//child process
     {
-        pidC = getpid();
+        pid_t pidC = getpid();
         printf("This is the child process, pid=%d and getpid=%d \n", process_id, pidC);
         fprintf(fp, "This is the child process, pid=%d and getpid=%d \n", process_id, pidC);
 
@@ -129,7 +138,32 @@ int main()
 
     pidOP = getpid();
     printf("This is the original parrent process, pid=%d\n", pidOP);
- 
+#if 1
+	struct region *rptr;
+	int fd;
+	system("mount /tmp/shm /dev/shm/pulse-shm-1770760191");
+	/* Create shared memory object and set its size */
+	fd = shm_open("/tmp/myregion", O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
+	if (fd == -1)
+	{
+		printf("shm_open \"myregion\" process failed, pid=%d\n", pidOP);
+		return 0;
+	};
+	
+	if (ftruncate(fd, sizeof(struct region)) == -1)
+	{
+		printf("ftruncate process failed, pid=%d\n", pidOP);
+		return 0;
+	};
+
+	/* Map shared memory object */
+	rptr = mmap(NULL, sizeof(struct region),PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	if (rptr == MAP_FAILED)
+	{
+		printf("MAP_FAILED, pid=%d\n", pidOP);
+		return 0;
+	};
+#endif
     // Create child process
     process_id = fork();
     // Indication of fork() failure
@@ -144,19 +178,26 @@ int main()
     {
         pidP = getpid();
         printf("This is the parrent process after fork, pid=%d and getpid=%d \n", process_id, pidP);
-        funprt();
+		rptr->len =10;
+		//printf("This is the parrent process, rptr->len = %d \n", rptr->len);
+
+		//funprt();
         exit(0);
     }
     else//child process
     {
         pidC = getpid();
         printf("This is the child process, pid=%d and getpid=%d \n", process_id, pidC);
-		funchd();
+		printf("This is the child process, rptr->len = %d \n", rptr->len);
+
+		//rptr->len =10;
+		//funchd();
 		//system("/usr/bin/processchd");
-        exit(0);
+        _exit(0);
     }
 
     return 0;
 }
 
+ 
 #endif
